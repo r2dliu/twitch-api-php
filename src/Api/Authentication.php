@@ -6,12 +6,8 @@ trait Authentication
 {
     /**
      * Get the Twitch OAuth URL
-     *
-     * @param string $state
-     * @param bool   $forceVerify
-     * @return string
      */
-    public function getAuthenticationUrl($state = null, $forceVerify = false)
+    public function getAuthenticationUrl(string $state = null, bool $forceVerify = false) : string
     {
         return implode('', [
             sprintf('%soauth2/authorize', $this->baseUri),
@@ -20,7 +16,7 @@ trait Authentication
             sprintf('&redirect_uri=%s', $this->getRedirectUri()),
             sprintf('&scope=%s', implode('+', $this->getScope())),
             sprintf('&state=%s', $state),
-            sprintf('&force_verify=%s', $forceVerify ? 'true' : 'false'),
+            sprintf('&force_verify=%s', var_export($forceVerify)),
         ]);
     }
 

@@ -1,7 +1,8 @@
 <?php
 
+namespace TwitchApi;
+
 use PHPUnit\Framework\TestCase;
-use TwitchApi\TwitchApi;
 use TwitchApi\Exceptions\ClientIdRequiredException;
 use TwitchApi\Exceptions\UnsupportedApiVersionException;
 
