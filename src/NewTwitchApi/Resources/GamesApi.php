@@ -20,6 +20,6 @@ class GamesApi extends AbstractResource
             'name' => $names,
         ];
 
-        return $this->callApi('games', $queryParamsMap);
+        return $this->callApi(self::GET, 'games', $queryParamsMap);
     }
 }

@@ -50,6 +50,6 @@ class StreamsApi extends AbstractResource
             'after' => $after,
         ];
 
-        return $this->callApi('streams', $queryParamsMap);
+        return $this->callApi(self::GET, 'streams', $queryParamsMap);
     }
 }

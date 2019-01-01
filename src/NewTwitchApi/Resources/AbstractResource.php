@@ -11,6 +11,9 @@ use Psr\Http\Message\ResponseInterface;
 
 abstract class AbstractResource
 {
+    const GET = 'GET';
+    const POST = 'POST';
+
     protected $guzzleClient;
 
     public function __construct(Client $guzzleClient)
@@ -21,10 +24,10 @@ abstract class AbstractResource
     /**
      * @throws GuzzleException
      */
-    protected function callApi(string $uriEndpoint, array $queryParamsMap = [], string $bearer = null): ResponseInterface
+    protected function callApi(string $method, string $uriEndpoint, array $queryParamsMap = [], string $bearer = null): ResponseInterface
     {
         $request = new Request(
-            'GET',
+            $method,
             sprintf('%s%s', $uriEndpoint, $this->generateQueryParams($queryParamsMap)),
             $bearer ? ['Authorization' => sprintf('Bearer %s', $bearer)] : []
         );

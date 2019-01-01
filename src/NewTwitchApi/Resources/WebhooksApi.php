@@ -20,6 +20,6 @@ class WebhooksApi extends AbstractResource
             'after' => $after,
         ];
 
-        return $this->callApi('webhooks/subscriptions', $queryParamsMap, $accessToken);
+        return $this->callApi(self::GET, 'webhooks/subscriptions', $queryParamsMap, $accessToken);
     }
 }

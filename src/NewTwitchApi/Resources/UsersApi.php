@@ -44,7 +44,7 @@ class UsersApi extends AbstractResource
             'login' => $usernames,
         ];
 
-        return $this->callApi('users', $queryParamsMap, $bearer);
+        return $this->callApi(self::GET, 'users', $queryParamsMap, $bearer);
     }
 
     /**
@@ -60,6 +60,6 @@ class UsersApi extends AbstractResource
             'after' => $after,
         ];
 
-        return $this->callApi('users/follows', $queryParamsMap);
+        return $this->callApi(self::GET, 'users/follows', $queryParamsMap);
     }
 }
