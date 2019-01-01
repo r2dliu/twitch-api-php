@@ -26,12 +26,12 @@ class OauthApi
     /**
      * @return string A full authentication URL, including the Guzzle client's base URI.
      */
-    public function getAuthUrl(string $redirectUri, string $responseType = 'code', string $scope = '', bool $forceVerify = false, string $state = null): string
+    public function getAuthUrl(string $redirectUri, string $responseType = 'code', array $scopes = [], bool $forceVerify = false, string $state = null): string
     {
         return sprintf(
             '%s%s',
             $this->guzzleClient->getConfig('base_uri'),
-            $this->getPartialAuthUrl($redirectUri, $responseType, $scope, $forceVerify, $state)
+            $this->getPartialAuthUrl($redirectUri, $responseType, $scopes, $forceVerify, $state)
         );
     }
 
@@ -58,7 +58,7 @@ class OauthApi
     /**
      * @throws GuzzleException
      */
-    public function refreshToken(string $refeshToken, string $scope = ''): ResponseInterface
+    public function refreshToken(string $refeshToken, array $scopes = []): ResponseInterface
     {
         $requestOptions = [
             'client_id' => $this->clientId,
@@ -66,8 +66,8 @@ class OauthApi
             'grant_type' => 'refresh_token',
             'refresh_token' => $refeshToken,
         ];
-        if ($scope) {
-            $requestOptions['scope'] = $scope;
+        if ($scopes) {
+            $requestOptions['scope'] = $this->implodeScopes($scopes);
         }
 
         return $this->makeRequest(
@@ -105,7 +105,7 @@ class OauthApi
     /**
      * @throws GuzzleException
      */
-    public function getAppAccessToken(string $scope = ''): ResponseInterface
+    public function getAppAccessToken(array $scopes = []): ResponseInterface
     {
         return $this->makeRequest(
             new Request('POST', 'token'),
@@ -114,7 +114,7 @@ class OauthApi
                     'client_id' => $this->clientId,
                     'client_secret' => $this->clientSecret,
                     'grant_type' => 'client_credentials',
-                    'scope' => $scope,
+                    'scope' => $this->implodeScopes($scopes),
                 ]
             ]
         );
@@ -131,7 +131,7 @@ class OauthApi
     /**
      * @return string A partial authentication URL, excluding the Guzzle client's base URI.
      */
-    private function getPartialAuthUrl(string $redirectUri, string $responseType = 'code', string $scope = '', bool $forceVerify = false, string $state = null): string
+    private function getPartialAuthUrl(string $redirectUri, string $responseType = 'code', array $scopes = [], bool $forceVerify = false, string $state = null): string
     {
         $optionalParameters = '';
         $optionalParameters .= $forceVerify ? '&force_verify=true' : '';
@@ -142,8 +142,13 @@ class OauthApi
             $this->clientId,
             $redirectUri,
             $responseType,
-            $scope,
+            $this->implodeScopes($scopes),
             $optionalParameters
         );
+    }
+
+    private function implodeScopes(array $scopes): string
+    {
+        return implode('%20', $scopes);
     }
 }
