@@ -10,6 +10,7 @@ use NewTwitchApi\HelixGuzzleClient;
 class WebhooksSubscriptionApi
 {
     public const SUBSCRIBE = 'subscribe';
+    public const UNSUBSCRIBE = 'unsubscribe';
 
     private $clientId;
     private $secret;
@@ -22,27 +23,29 @@ class WebhooksSubscriptionApi
         $this->guzzleClient = $guzzleClient ?? new HelixGuzzleClient($clientId);
     }
 
-    public function subscribeToStream(string $twitchId, string $bearer, string $callback, int $leaseSeconds = 0): void
+    public function subscribeToStream(string $twitchId, string $bearer, string $callback, int $leaseSeconds = 0, string $mode = self::SUBSCRIBE): void
     {
         $this->subscribe(
             sprintf('https://api.twitch.tv/helix/streams?user_id=%s', $twitchId),
             $bearer,
             $callback,
-            $leaseSeconds
+            $leaseSeconds,
+            $mode
         );
     }
 
-    public function subscribeToUser(string $twitchId, string $bearer, string $callback, int $leaseSeconds = 0): void
+    public function subscribeToUser(string $twitchId, string $bearer, string $callback, int $leaseSeconds = 0, string $mode = self::SUBSCRIBE): void
     {
         $this->subscribe(
             sprintf('https://api.twitch.tv/helix/users?id=%s', $twitchId),
             $bearer,
             $callback,
-            $leaseSeconds
+            $leaseSeconds,
+            $mode
         );
     }
 
-    public function subscribeToUserFollows(string $followerId, string $followedUserId, int $first, string $bearer, string $callback, int $leaseSeconds = 0): void
+    public function subscribeToUserFollows(string $followerId, string $followedUserId, int $first, string $bearer, string $callback, int $leaseSeconds = 0, string $mode = self::SUBSCRIBE): void
     {
         $queryParams = [];
         if ($followerId) {
@@ -58,7 +61,8 @@ class WebhooksSubscriptionApi
             sprintf('https://api.twitch.tv/helix/users/follows?%s', http_build_query($queryParams)),
             $bearer,
             $callback,
-            $leaseSeconds
+            $leaseSeconds,
+            $mode
         );
     }
 
@@ -70,7 +74,7 @@ class WebhooksSubscriptionApi
         return $expectedHash === $generatedHash;
     }
 
-    private function subscribe(string $topic, string $bearer, string $callback, int $leaseSeconds = 0): void
+    private function subscribe(string $topic, string $bearer, string $callback, int $leaseSeconds = 0, string $mode = self::SUBSCRIBE): void
     {
         $headers = [
             'Authorization' => sprintf('Bearer %s', $bearer),
@@ -79,7 +83,7 @@ class WebhooksSubscriptionApi
 
         $body = [
             'hub.callback' => $callback,
-            'hub.mode' => self::SUBSCRIBE,
+            'hub.mode' => $mode,
             'hub.topic' => $topic,
             'hub.lease_seconds' => $leaseSeconds,
             'hub.secret' => $this->secret,
